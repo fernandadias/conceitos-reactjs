@@ -4,29 +4,43 @@ import api from "./services/api";
 import "./styles.css";
 
 function App() {
-  const [projects, setProjects] = useState([]);
+  const [repositories, setRepositories] = useState([]);
 
   useEffect(() => {
-    api.get("projects").then((response) => {
-      setProjects(response.data);
+    api.get("repositories").then((response) => {
+      setRepositories(response.data);
     });
   }, []);
 
   async function handleAddRepository() {
-    // TODO
+    const response = await api.post("repositories", {
+      title: `Novo repo ${Date.now()}`,
+      url: "www.google.com",
+      techs: ["Node.js", "..."],
+    });
+
+    const repository = response.data;
+
+    setRepositories([...repositories, repository]);
+    console.log(repositories);
   }
 
   async function handleRemoveRepository(id) {
-    // TODO
+    const response = await api.delete(`repositories/${id}`);
+    const repositoryList = repositories.filter(
+      (repository) => repository.id !== id
+    );
+
+    setRepositories(repositoryList);
   }
 
   return (
     <div>
       <ul data-testid="repository-list">
-        {projects.map((project) => (
-          <li key={project.id}>
-            {project.title}
-            <button onClick={() => handleRemoveRepository(project.id)}>
+        {repositories.map((repository) => (
+          <li key={repository.id}>
+            {repository.title}
+            <button onClick={() => handleRemoveRepository(repository.id)}>
               Remover
             </button>
           </li>
